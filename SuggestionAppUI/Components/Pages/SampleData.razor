@@ -3,6 +3,8 @@
 
 @inject ICategoryData categoryData
 @inject IStatusData statusData
+@inject IUserData userData
+@inject ISuggestionData suggestionData
 
 
 <h3>Sample Data</h3>
@@ -25,10 +27,94 @@ else
     <button class="btn btn-primary" @onclick="CreateStatuses">Create Statuses</button>
 }
 
+<button class="btn btn-danger" @onclick="CreateTestData">Generate Test Data</button>
+
+
 
 @code {
     private bool categoriesCreated = false;
     private bool statusesCreated = false;
+
+    private async Task CreateTestData()
+    {
+        UserModel user = new()
+            {
+                FirstName = "Robert",
+                LastName = "Rancz",
+                EmailAddress = "robert@test.com",
+                DisplayName = "Robert Rancz Test User",
+                ObjectIdentifier = "abc-123"
+            };
+        await userData.CreateUserAsync(user);
+
+        var createdUser = await userData.GetUserFromAuthenticationAsync(user.ObjectIdentifier);
+        var categories = await categoryData.GetAllCategoriesAsync();
+        var statuses = await statusData.GetAllStatusesAsync();
+
+        HashSet<string> votes = new() { "1", "2", "3" };
+
+        SuggestionModel suggestion = new()
+            {
+                Author = new UserModelBasic(createdUser),
+                Category = categories[0],
+                Suggestion = "Our first suggestion",
+                Description = "This is a suggestion created by the test data generation method.",
+                ApprovedForRelease = true
+            };
+        await suggestionData.CreateSuggestionAsync(suggestion);
+
+        suggestion = new()
+            {
+                Author = new UserModelBasic(createdUser),
+                Category = categories[1],
+                Suggestion = "Our second suggestion",
+                Description = "This is a suggestion created by the test data generation method.",
+                SuggestionStatus = statuses[0],
+                OwnerNotes = "This is the note for the status",
+                ApprovedForRelease = true
+            };
+        await suggestionData.CreateSuggestionAsync(suggestion);
+
+        suggestion = new()
+            {
+                Author = new UserModelBasic(createdUser),
+                Category = categories[2],
+                Suggestion = "Our third suggestion",
+                Description = "This is a suggestion created by the test data generation method.",
+                SuggestionStatus = statuses[1],
+                OwnerNotes = "This is the note for the status",
+                ApprovedForRelease = true
+            };
+        await suggestionData.CreateSuggestionAsync(suggestion);
+
+        suggestion = new()
+            {
+                Author = new UserModelBasic(createdUser),
+                Category = categories[3],
+                Suggestion = "Our fourth suggestion",
+                Description = "This is a suggestion created by the test data generation method.",
+                SuggestionStatus = statuses[2],
+                OwnerNotes = "This is the note for the status",
+                UserVotes = votes,
+                ApprovedForRelease = true
+            };
+        await suggestionData.CreateSuggestionAsync(suggestion);
+
+        votes.Add("4");
+
+        suggestion = new()
+            {
+                Author = new UserModelBasic(createdUser),
+                Category = categories[4],
+                Suggestion = "Our fifth suggestion",
+                Description = "This is a suggestion created by the test data generation method.",
+                SuggestionStatus = statuses[3],
+                OwnerNotes = "This is the note for the status",
+                UserVotes = votes,
+                ApprovedForRelease = true
+            };
+        await suggestionData.CreateSuggestionAsync(suggestion);
+    }
 
     private async Task CreateCategories()
     {

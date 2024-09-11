@@ -112,7 +112,7 @@ namespace SuggestionAppLibrary.DataAccess
             try
             {
                 var db = client.GetDatabase(_db.DbName);
-                var suggestionsInTransaction = db.GetCollection<SuggestionModel>(_db.StatusCollectionName);
+                var suggestionsInTransaction = db.GetCollection<SuggestionModel>(_db.SuggestionCollectionName);
                 await suggestionsInTransaction.InsertOneAsync(suggestion);
                 var usersInTransaction = db.GetCollection<UserModel>(_db.UserCollectionName);
                 var user = await _userData.GetUserAsync(suggestion.Author.Id);
