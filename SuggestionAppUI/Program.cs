@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Rewrite;
 using SuggestionAppUI;
 using SuggestionAppUI.Components;
 
@@ -19,6 +20,20 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseRewriter(new Microsoft.AspNetCore.Rewrite.RewriteOptions().Add(context =>
+{
+    if(context.HttpContext.Request.Path == "/MicrosoftIdentity/Account/SignedOut")
+    {
+        context.HttpContext.Response.Redirect("/");
+    }
+}));
+
+// Needed for MicrosoftIdentityUI (see ConfigureServices)
+app.MapControllers();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
