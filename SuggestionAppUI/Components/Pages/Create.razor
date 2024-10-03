@@ -1,9 +1,12 @@
 ﻿@page "/Create"
+@attribute [Authorize]
 @rendermode InteractiveServer
 
+@using Microsoft.AspNetCore.Components.Authorization
 @using SuggestionAppUI.Components.Custom
 @using SuggestionAppUI.Models
 
+@inject AuthenticationStateProvider authProvider
 @inject ICategoryData categoryData
 @inject ISuggestionData suggestionData
 @inject IUserData userData;
@@ -63,8 +66,9 @@
     {
         categories = await categoryData.GetAllCategoriesAsync();
 
-        // TODO Replace with actual user lookup
-        loggedInUser = await userData.GetUserFromAuthenticationAsync("abc-123");
+        var authState = await authProvider.GetAuthenticationStateAsync();
+        string? objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
+        loggedInUser = await userData.GetUserFromAuthenticationAsync(objectId);
     }
 
     private void ClosePage()
