@@ -2,7 +2,9 @@
 @rendermode InteractiveServer
 
 @inject ISuggestionData suggestionData
+@inject IUserData userData
 @inject NavigationManager navManager
+@inject AuthenticationStateProvider authProvider
 
 <h1>Suggestion Details</h1>
 
@@ -12,7 +14,7 @@
         {
             <div>
                 <div>
-                    <div>
+                    <div @onclick="VoteUp">
                         <div>@GetUpvoteTopText()</div>
                         <span class="bi bi-caret-up-fill"></span>
                         <div>@GetUpvoteBottomText()</div>
@@ -53,10 +55,12 @@
     public string Id { get; set; }
 
     private SuggestionModel suggestion;
+    private UserModel loggedInUser;
 
     protected override async Task OnInitializedAsync()
     {
         suggestion = await suggestionData.GetSuggestionAsync(Id);
+        loggedInUser = await authProvider.GetUserFromAuth(userData);
     }
 
     private void ClosePage()
@@ -72,7 +76,8 @@
         }
         else
         {
-            return "Click To";
+            if (suggestion.Author.Id == loggedInUser?.Id) return "Awaiting";
+            else return "Click To";
         }
     }
 
@@ -85,6 +90,29 @@
         else
         {
             return "Upvote";
+        }
+    }
+
+    private async Task VoteUp()
+    {
+        if (loggedInUser is not null)
+        {
+            if (suggestion.Author.Id == loggedInUser.Id)
+            {
+                // Can't vote on your own suggestion
+                return;
+            }
+            if (suggestion.UserVotes.Add(loggedInUser.Id) == false)
+            {
+                // Already voted this suggestion, so remove previous vote.
+                suggestion.UserVotes.Remove(loggedInUser.Id);
+            }
+
+            await suggestionData.UpvoteSuggestionAsync(suggestion.Id, loggedInUser.Id);
+        }
+        else
+        {
+            navManager.NavigateTo("/MicrosoftIdentity/Account/SignIn", forceLoad: true);
         }
     }
 }
