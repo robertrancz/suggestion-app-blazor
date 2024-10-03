@@ -93,7 +93,7 @@
     {
         categories = await categoryData.GetAllCategoriesAsync();
         statuses = await statusData.GetAllStatusesAsync();
-        loggedInUser = await authProvider.GetUserFromAuth(userData);
+        await SyncAuthProviderUserToDatabase();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -103,6 +103,63 @@
             await LoadFilterState();
             await FilterSuggestions();
             StateHasChanged();
+        }
+    }
+
+    private async Task SyncAuthProviderUserToDatabase()
+    {
+        var authState = await authProvider.GetAuthenticationStateAsync();
+        string? objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
+
+        if(!string.IsNullOrWhiteSpace(objectId))
+        {
+            loggedInUser = await userData.GetUserFromAuthenticationAsync(objectId) ?? new();
+
+            string? firstName = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("givenname"))?.Value;
+            string? lastName = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("surname"))?.Value;
+            string? displayName = authState.User.Claims.FirstOrDefault(c => c.Type.Equals("name"))?.Value;
+            string? email = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("email"))?.Value;
+
+            bool isDirty = false;
+
+            if(!objectId.Equals(loggedInUser.ObjectIdentifier))
+            {
+                isDirty = true;
+                loggedInUser.ObjectIdentifier = objectId;
+
+            }
+            if (firstName is not null && !firstName.Equals(loggedInUser.FirstName))
+            {
+                isDirty = true;
+                loggedInUser.FirstName = firstName;
+            }
+            if (lastName is not null && !lastName.Equals(loggedInUser.LastName))
+            {
+                isDirty = true;
+                loggedInUser.LastName = lastName;
+            }
+            if (displayName is not null && !displayName.Equals(loggedInUser.DisplayName))
+            {
+                isDirty = true;
+                loggedInUser.DisplayName = displayName;
+            }
+            if (email is not null && !email.Equals(loggedInUser.EmailAddress))
+            {
+                isDirty = true;
+                loggedInUser.EmailAddress = email;
+            }
+
+            if(isDirty)
+            {
+                if(string.IsNullOrWhiteSpace(loggedInUser.Id))
+                {
+                    await userData.CreateUserAsync(loggedInUser);
+                }
+                else
+                {
+                    await userData.UpdateUserAsync(loggedInUser);
+                }
+            }
         }
     }
 
