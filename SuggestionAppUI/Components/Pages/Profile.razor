@@ -2,6 +2,7 @@
 @attribute [Authorize]
 @rendermode InteractiveServer
 
+@inject AuthenticationStateProvider authProvider
 @inject ISuggestionData suggestionData
 @inject IUserData userData
 @inject NavigationManager navManager
@@ -123,8 +124,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // TODO Replace with actual user lookup
-        loggedInUser = await userData.GetUserFromAuthenticationAsync("abc-123");
+        loggedInUser = await authProvider.GetUserFromAuth(userData);
 
         var result = await suggestionData.GetUserSuggestionsAsync(loggedInUser.Id);
 

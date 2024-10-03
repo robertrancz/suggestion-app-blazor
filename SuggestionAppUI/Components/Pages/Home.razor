@@ -9,6 +9,7 @@
 @inject ISuggestionData suggestionData
 @inject NavigationManager navManager
 @inject ProtectedSessionStorage sessionStorage
+@inject AuthenticationStateProvider authProvider
 
 <h1>Training Suggestions</h1>
 <div>
@@ -81,6 +82,7 @@
     private List<SuggestionModel> suggestions;
     private List<CategoryModel> categories;
     private List<StatusModel> statuses;
+    private UserModel loggedInUser;
 
     private string selectedCategory = "All";
     private string selectedStatus = "All";
@@ -91,6 +93,7 @@
     {
         categories = await categoryData.GetAllCategoriesAsync();
         statuses = await statusData.GetAllStatusesAsync();
+        loggedInUser = await authProvider.GetUserFromAuth(userData);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

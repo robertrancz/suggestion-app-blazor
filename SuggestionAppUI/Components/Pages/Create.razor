@@ -2,7 +2,6 @@
 @attribute [Authorize]
 @rendermode InteractiveServer
 
-@using Microsoft.AspNetCore.Components.Authorization
 @using SuggestionAppUI.Components.Custom
 @using SuggestionAppUI.Models
 
@@ -65,10 +64,7 @@
     protected override async Task OnInitializedAsync()
     {
         categories = await categoryData.GetAllCategoriesAsync();
-
-        var authState = await authProvider.GetAuthenticationStateAsync();
-        string? objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
-        loggedInUser = await userData.GetUserFromAuthenticationAsync(objectId);
+        loggedInUser = await authProvider.GetUserFromAuth(userData);
     }
 
     private void ClosePage()
