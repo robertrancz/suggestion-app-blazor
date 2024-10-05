@@ -23,8 +23,14 @@ h1 {
 }
 
 a, .btn-link {
-    color: #006bb7;
+    color: #FFFFFF;
+    text-decoration: none;
 }
+
+    a:hover, .btn-link:hover {
+        color: #FFFFFF;
+        text-decoration: underline;
+    }
 
 .btn-primary {
     color: #fff;
@@ -281,4 +287,15 @@ h1:focus {
 .suggestion-entry-status-none {
     background-color: #FFFFFF;
     border: 1px #FFFFFF solid;
+}
+
+.nav-links {
+    display: flex;
+    text-align: center;
+    justify-content: flex-end;
+}
+
+.login-link {
+    padding-left: 1rem;
+
 }
