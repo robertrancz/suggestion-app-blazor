@@ -6,12 +6,12 @@
 @inject IUserData userData
 @inject NavigationManager navManager
 
-<h1>Pending Submissions</h1>
+<h1 class="page-heading text-uppercase mb-4">Pending Submissions</h1>
 
-<div>
-    <div>@submissions?.Count Submissions</div>
-    <div>
-        <button @onclick="ClosePage"></button>
+<div class="row">
+    <div class="suggestions-count col-8 mt-2">@submissions?.Count Submissions</div>
+    <div class="col-4 close-button-section">
+        <button class="btn btn-close" @onclick="ClosePage"></button>
     </div>
 </div>
 
@@ -19,29 +19,29 @@
 {
     foreach (var item in submissions)
     {
-        <div>
-            <div>
-                <button @onclick="(() => ApproveSubmission(item))">Approve</button>
-                <button @onclick="(() => RejectSubmission(item))">Reject</button>
+        <div class="row submission">
+            <div class="col-lg-2 col-md-3 col-sm-4">
+                <button class="btn btn-approve" @onclick="(() => ApproveSubmission(item))">Approve</button>
+                <button class="btn btn-reject" @onclick="(() => RejectSubmission(item))">Reject</button>
             </div>
-            <div>
+            <div class="col-lg-10 col-md-9 col-sm-8">
                 <div>
                     @if (currentEditingTitle == item.Id)
                     {
-                        <EditForm Model="@editedTitle" OnSubmit="(() => SaveTitle(item))">
-                            <InputText @bind-Value="editedTitle" />
-                            <button type="submit">
-                                <span class="bi bi-check-square-fill"></span>
+                        <EditForm class="approval-edit-form" Model="@editedTitle" OnSubmit="(() => SaveTitle(item))">
+                            <InputText class="form-control approval-edit-field" @bind-Value="editedTitle" />
+                            <button class="btn" type="submit">
+                                <span class="bi bi-check-square-fill submission-edit-approve"></span>
                             </button>
-                            <button @onclick="(() => currentEditingTitle = string.Empty)">
-                                <span class="bi bi-x-square-fill"></span>
+                            <button class="btn" type="button" @onclick="(() => currentEditingTitle = string.Empty)">
+                                <span class="bi bi-x-square-fill submission-edit-reject"></span>
                             </button>
                         </EditForm>
                     }
                     else
                     {
                         @item.Suggestion
-                        <span class="bi bi-pencil-square" @onclick="(() => EditTitle(item))"></span>
+                        <span class="bi bi-pencil-square submission-edit-icon" @onclick="(() => EditTitle(item))"></span>
                     }
                 </div>
                 <div>@item.Category.CategoryName</div>
@@ -49,20 +49,20 @@
                 <div>
                     @if (currentEditingDescription == item.Id)
                     {
-                        <EditForm Model="@editedDescription" OnSubmit="(() => SaveDescription(item))">
-                            <InputText @bind-Value="editedDescription" />
-                            <button type="submit">
-                                <span class="bi bi-check-square-fill"></span>
+                        <EditForm class="approval-edit-form" Model="@editedDescription" OnSubmit="(() => SaveDescription(item))">
+                            <InputText class="form-control approval-edit-field" @bind-Value="editedDescription" />
+                            <button class="btn" type="submit">
+                                <span class="bi bi-check-square-fill submission-edit-approve"></span>
                             </button>
-                            <button @onclick="(() => currentEditingDescription = string.Empty)">
-                                <span class="bi bi-x-square-fill"></span>
+                            <button class="btn" type="button" @onclick="(() => currentEditingDescription = string.Empty)">
+                                <span class="bi bi-x-square-fill submission-edit-reject"></span>
                             </button>
                         </EditForm>
                     }
                     else
                     {
                         @item.Description
-                        <span class="bi bi-pencil-square" @onclick="(() => EditDescription(item))"></span>
+                        <span class="bi bi-pencil-square submission-edit-icon" @onclick="(() => EditDescription(item))"></span>
                     }
                 </div>
             </div>
